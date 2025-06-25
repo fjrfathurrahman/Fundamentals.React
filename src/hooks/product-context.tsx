@@ -9,20 +9,20 @@ interface ProductContext {
   isLoading: boolean;
   isError: boolean;
 
-  categories: string[]
-  category: string | null;
-  setCategory: (category: string | null) => void;
+  categories: string[];
+  category: string;
+  setCategory: (category: string) => void;
 }
 
 export const ProductContext = createContext<ProductContext | null>(null);
 
 export default function ProductProvider({ children }: { children: React.ReactNode }) {
-  // Get All Products
-  const { products, response, isError, isLoading } = useGetProducts();
-  
   // Feature Category
-  const [category, setCategory] = useState<string | null>(null);
+  const [category, setCategory] = useState<string>("all");
   const { categories } = useGetCategories();
+
+  // Get All Products
+  const { products, response, isError, isLoading } = useGetProducts({ category });
 
   // values
   const values = useMemo(
@@ -36,7 +36,7 @@ export default function ProductProvider({ children }: { children: React.ReactNod
       category,
       setCategory,
     }),
-    [products, isError, isLoading, response, categories,  category, setCategory]
+    [products, isError, isLoading, response, categories, category, setCategory]
   );
 
   return <ProductContext.Provider value={values}>{children}</ProductContext.Provider>;

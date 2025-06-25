@@ -34,7 +34,7 @@ const activeFilters = [
 ];
 
 export const SidebarFiltering = React.memo(() => {
-  const { setCategory, categories } = useProduct();
+  const { setCategory, categories, category } = useProduct();
 
   return (
     <Card className="w-80 h-max">
@@ -61,7 +61,6 @@ export const SidebarFiltering = React.memo(() => {
         )}
       </CardHeader>
       <CardContent className="space-y-6">
-        
         {/* Categories */}
         {categories.length > 0 && (
           <>
@@ -72,8 +71,12 @@ export const SidebarFiltering = React.memo(() => {
                 <AccordionTrigger className="text-base font-medium hover:no-underline">Categories</AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-3">
-                    <RadioGroup onValueChange={value => setCategory(value)}>
-                      {/* Categories can not be sellected like this; only one category can be sellected  */}
+                    <RadioGroup defaultValue={category} onValueChange={value => setCategory(value)}>
+                      <div className="flex items-center gap-3 capitalize">
+                        <RadioGroupItem value="all" />
+                        <Label>All</Label>
+                      </div>
+
                       {categories.map((c: string, i: number) => (
                         <div key={i} className="flex items-center gap-3 capitalize">
                           <RadioGroupItem value={c} id={i.toString()} />

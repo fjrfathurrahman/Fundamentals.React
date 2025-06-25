@@ -1,4 +1,3 @@
-import './App.css';
 import SearchBar from './components/search-bar';
 import { ProductList } from './components/product-list';
 import ProductProvider from './hooks/product-context';
