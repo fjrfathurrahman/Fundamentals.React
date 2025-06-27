@@ -1,9 +1,18 @@
 import { BoxIcon } from 'lucide-react';
+import type { Product } from '../services/types';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { ProductCard } from './product-card';
-import { useProduct } from '../hooks/product-context';
+import { useProductStore } from '../store/product';
 
-export function ProductList() {
-  const { data, isError, isLoading, products } = useProduct();
+interface ProductListProps {
+  products: Product[];
+  data: any;
+  isLoading: boolean;
+}
+
+export function ProductList({ data, isLoading, products }: ProductListProps) {
+  const fetchMoreProducts = useProductStore(s => s.fetchMoreProducts);
+  console.log('ProductList');
 
   if (isLoading) {
     return (
@@ -41,13 +50,20 @@ export function ProductList() {
   return (
     <div className="space-y-6">
       <p className="text-muted-foreground">
-        Showing {data.limit} products out {data.total}
+        Showing {products.length} products out {data.total}
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
-        {products.map(product => (
-          <ProductCard key={product.id} product={product} />
+
+      <InfiniteScroll
+        dataLength={products.length}
+        next={fetchMoreProducts}
+        hasMore={true}
+        loader={null}
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6"
+      >
+        {products.map((i, index) => (
+          <ProductCard key={index} product={i} />
         ))}
-      </div>
+      </InfiniteScroll>
     </div>
   );
 }

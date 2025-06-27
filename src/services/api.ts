@@ -1,17 +1,33 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { useProductStore } from '../store/product';
 
-export function AxiosInstance() {
-  return axios.create({
-    baseURL: 'https://dummyjson.com',
-  });
+//
+export const AxiosInstance = () => axios.create({ baseURL: 'https://dummyjson.com' });
+
+export async function getProducts({ limit, skip }: { limit: number; skip: number }) {
+  await new Promise(resolve => setTimeout(resolve, 700));
+
+  const endpoint = `products?limit=${limit}&skip=${skip}`;
+  const res = await AxiosInstance().get(endpoint);
+  return res.data;
+}
+
+
+export async function getCategories() {
+  return (await AxiosInstance().get('products/category-list')).data;
 }
 
 export function useGetProducts({ category }: { category: string | null }) {
   const [data, setData] = useState<any>([]);
   const [query, setQuery] = useState({ isLoading: false, isError: false });
 
-  const URL = !category || category === 'all' ? 'products' : `products/category/${category}`;
+  const {
+    filters: { limit },
+  } = useProductStore();
+
+  // Endpoint
+  const URL = `products?limit=${limit}`;
 
   const fecthData = async () => {
     setQuery(prev => ({ ...prev, isLoading: true }));
@@ -33,7 +49,8 @@ export function useGetProducts({ category }: { category: string | null }) {
   useEffect(() => {
     fecthData();
     return () => {};
-  }, [category]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category, limit]);
 
   return {
     response: data,
@@ -58,6 +75,7 @@ export function useGetCategories() {
 
   useEffect(() => {
     fecthData();
+
     return () => {};
   }, []);
 

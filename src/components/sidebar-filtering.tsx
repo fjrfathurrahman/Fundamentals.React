@@ -6,10 +6,9 @@ import { Label } from './ui/label';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
-import { useGetCategories } from '../services/api';
-import { useProduct } from '../hooks/product-context';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import React from 'react';
+import { useProductStore } from '../store/product';
 
 const brands = [
   { id: 'apple', name: 'Apple', count: 12 },
@@ -34,7 +33,11 @@ const activeFilters = [
 ];
 
 export const SidebarFiltering = React.memo(() => {
-  const { setCategory, categories, category } = useProduct();
+  const categories = useProductStore(s => s.categories);
+  const category = useProductStore(s => s.filters.category);
+  const setCategory = useProductStore(s => s.filters.setCategory);
+
+  console.log('SidebarFiltering');
 
   return (
     <Card className="w-80 h-max">
@@ -72,11 +75,6 @@ export const SidebarFiltering = React.memo(() => {
                 <AccordionContent>
                   <div className="space-y-3">
                     <RadioGroup defaultValue={category} onValueChange={value => setCategory(value)}>
-                      <div className="flex items-center gap-3 capitalize">
-                        <RadioGroupItem value="all" />
-                        <Label>All</Label>
-                      </div>
-
                       {categories.map((c: string, i: number) => (
                         <div key={i} className="flex items-center gap-3 capitalize">
                           <RadioGroupItem value={c} id={i.toString()} />
