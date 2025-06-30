@@ -1,51 +1,54 @@
 import { create } from 'zustand';
-import type { Product } from '../services/types';
+import type { Product, ProductStore } from '../services/types';
 import { getCategories, getProducts } from '../services/api';
 
-export type Limit = 10 | 20 | 30 | 40 | 50;
-
-interface ProductState {
-  fetchProducts: () => Promise<void>;
-  fetchMoreProducts: () => Promise<void>;
-  fetchCategories: () => Promise<void>;
-
-  data: {
-    products: Product[];
-    rawResponse: any;
-  };
-  categories: string[];
-
-  filters: {
-    limit: Limit;
-    category?: string;
-    setLimit: (limit: Limit) => void;
-    setCategory: (category?: string) => void;
-  };
-
-  total: number;
-  hasMore: boolean;
-
-  isLoading: boolean;
-  isError: boolean;
-}
-
-export const useProductStore = create<ProductState>((set, get) => ({
-  data: {
-    products: [],
-    rawResponse: {},
-  },
+export const useProductStore = create<ProductStore>((set, get) => ({
+  data: { products: [], rawResponse: {} },
   categories: [],
-  isError: false,
-  isLoading: false,
   total: 0,
   hasMore: true,
+  isLoading: false,
+  isError: false,
+
+  filters: {
+    search: '',
+    category: 'all',
+    sort: 'title',
+    order: 'asc',
+    limit: 30,
+
+    setSearch: search =>
+      set(state => ({
+        filters: { ...state.filters, search },
+      })),
+
+    setCategory: category =>
+      set(state => ({
+        filters: { ...state.filters, category },
+      })),
+
+    setSort: sort =>
+      set(state => ({
+        filters: { ...state.filters, sort },
+      })),
+
+    setOrder: order =>
+      set(state => ({
+        filters: { ...state.filters, order },
+      })),
+
+    setLimit: limit =>
+      set(state => ({
+        filters: { ...state.filters, limit },
+      })),
+  },
 
   fetchProducts: async () => {
     set({ isLoading: true, isError: false });
 
     try {
-      const { limit } = get().filters;
-      const res = await getProducts({ limit, skip: 0 });
+      const { limit, category, order, sort } = get().filters;
+      const res = await getProducts({ category, limit, order, skip: 0, sort });
 
       set({
         data: {
@@ -69,7 +72,15 @@ export const useProductStore = create<ProductState>((set, get) => ({
     if (currentCount >= total) return;
 
     try {
-      const res = await getProducts({ limit: 10, skip: currentCount });
+      const { category, order, sort, limit } = get().filters;
+      const res = await getProducts({
+        category,
+        order,
+        sort,
+        limit,
+        skip: currentCount,
+      });
+
       const newProducts = res?.products ?? [];
 
       set(state => ({
@@ -88,16 +99,10 @@ export const useProductStore = create<ProductState>((set, get) => ({
 
   fetchCategories: async () => {
     try {
-      set({ categories: await getCategories() });
+      const categories = await getCategories();
+      set({ categories });
     } catch (e) {
       console.error(e);
     }
-  },
-
-  filters: {
-    limit: 30,
-    category: undefined,
-    setLimit: limit => set(state => ({ filters: { ...state.filters, limit } })),
-    setCategory: category => set(state => ({ filters: { ...state.filters, category } })),
   },
 }));

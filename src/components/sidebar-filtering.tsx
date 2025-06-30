@@ -1,14 +1,14 @@
-import { Filter, X } from 'lucide-react';
+import React from 'react';
+import { Filter } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Checkbox } from './ui/checkbox';
 import { Label } from './ui/label';
-import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
-import React from 'react';
 import { useProductStore } from '../store/product';
+import { useActiveFilters } from '../lib/utils';
 
 const brands = [
   { id: 'apple', name: 'Apple', count: 12 },
@@ -26,40 +26,32 @@ const colors = [
   { id: 'green', name: 'Green', color: '#10B981' },
 ];
 
-const activeFilters = [
-  { id: 'electronics', label: 'Electronics', type: 'category' },
-  { id: 'nike', label: 'Nike', type: 'brand' },
-  { id: 'black', label: 'Black', type: 'color' },
-];
-
-export const SidebarFiltering = React.memo(() => {
+function SidebarFiltering() {
   const categories = useProductStore(s => s.categories);
   const category = useProductStore(s => s.filters.category);
   const setCategory = useProductStore(s => s.filters.setCategory);
 
-  console.log('SidebarFiltering');
+  const filtered = useActiveFilters();
 
   return (
-    <Card className="w-80 h-max">
+    <Card className="w-80 h-max hidden md:block">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Filter className="h-5 w-5" />
           Filters
         </CardTitle>
-        {activeFilters.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-2">
-            {activeFilters.map(filter => (
-              <Badge key={filter.id} variant="secondary" className="text-xs">
-                {filter.label}
-                <Button variant="ghost" size="sm" className="h-auto p-0 ml-1 hover:bg-transparent">
-                  <X className="h-3 w-3" />
-                  <span className="sr-only">Remove {filter.label} filter</span>
-                </Button>
-              </Badge>
+        {filtered.length > 0 && (
+          <div className="flex flex-col gap-2 mt-4">
+            {filtered.map(item => (
+              <div
+                key={item.label}
+                className="flex justify-between items-center border rounded-md px-2 py-1 hover:scale-95 transition-all duration-300 text-sm capitalize"
+              >
+                {item.label}
+              </div>
             ))}
-            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-              Clear all
-            </Button>
+
+            <Button>Reset Default</Button>
           </div>
         )}
       </CardHeader>
@@ -75,6 +67,11 @@ export const SidebarFiltering = React.memo(() => {
                 <AccordionContent>
                   <div className="space-y-3">
                     <RadioGroup defaultValue={category} onValueChange={value => setCategory(value)}>
+                      <div className="flex items-center gap-3 capitalize">
+                        <RadioGroupItem value='all' />
+                        <Label>All</Label>
+                      </div>
+
                       {categories.map((c: string, i: number) => (
                         <div key={i} className="flex items-center gap-3 capitalize">
                           <RadioGroupItem value={c} id={i.toString()} />
@@ -159,4 +156,6 @@ export const SidebarFiltering = React.memo(() => {
       </CardContent>
     </Card>
   );
-});
+}
+
+export default React.memo(SidebarFiltering);

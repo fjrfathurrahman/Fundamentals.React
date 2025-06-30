@@ -1,8 +1,8 @@
 import { BoxIcon } from 'lucide-react';
 import type { Product } from '../services/types';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { ProductCard } from './product-card';
 import { useProductStore } from '../store/product';
+import ProductCard from './product-card';
 
 interface ProductListProps {
   products: Product[];
@@ -10,7 +10,7 @@ interface ProductListProps {
   isLoading: boolean;
 }
 
-export function ProductList({ data, isLoading, products }: ProductListProps) {
+export default function ProductList({ data, isLoading, products }: ProductListProps) {
   const fetchMoreProducts = useProductStore(s => s.fetchMoreProducts);
   console.log('ProductList');
 
@@ -37,7 +37,7 @@ export function ProductList({ data, isLoading, products }: ProductListProps) {
 
   if (products?.length === 0) {
     return (
-      <div className="text-center py-12 h-[50vh] border-4 border-gray-400/25 rounded-xl border-dashed flex flex-col justify-center">
+      <div className="text-center py-12 h-[50vh] border-2 border-gray-400/25 rounded-xl border-dashed flex flex-col justify-center">
         <div className="text-gray-400 mb-4 text-center flex items-center justify-center">
           <BoxIcon size={100} />
         </div>
@@ -58,7 +58,7 @@ export function ProductList({ data, isLoading, products }: ProductListProps) {
         next={fetchMoreProducts}
         hasMore={true}
         loader={null}
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
       >
         {products.map((i, index) => (
           <ProductCard key={index} product={i} />
