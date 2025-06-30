@@ -1,8 +1,8 @@
-import SidebarFiltering  from './components/sidebar-filtering';
 import { useEffect } from 'react';
-import { useProductStore } from './store/product';
-import ProductList  from './components/product-list';
+import ProductList from './components/product-list';
 import SearchBar from './components/search-bar';
+import SidebarFiltering from './components/sidebar-filtering';
+import { useProductStore } from './store/product';
 
 function App() {
   console.log('app');
@@ -14,7 +14,6 @@ function App() {
   const limit = useProductStore(s => s.filters.limit);
   const sort = useProductStore(s => s.filters.sort);
   const order = useProductStore(s => s.filters.order);
-  const search = useProductStore(s => s.filters.search);
 
   const data = useProductStore(s => s.data.rawResponse);
   const products = useProductStore(s => s.data.products);
@@ -27,7 +26,7 @@ function App() {
   useEffect(() => {
     fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category, limit, sort, order, search]);
+  }, [category, limit, sort, order]);
 
   return (
     <div className="container mx-auto p-6 space-y-8">

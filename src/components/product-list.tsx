@@ -12,7 +12,6 @@ interface ProductListProps {
 
 export default function ProductList({ data, isLoading, products }: ProductListProps) {
   const fetchMoreProducts = useProductStore(s => s.fetchMoreProducts);
-  console.log('ProductList');
 
   if (isLoading) {
     return (

@@ -48,7 +48,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
 
     try {
       const { limit, category, order, sort } = get().filters;
-      const res = await getProducts({ category, limit, order, skip: 0, sort });
+      const res = await getProducts({ category, limit, order, skip: 0, sort, search: get().filters.search });
 
       set({
         data: {

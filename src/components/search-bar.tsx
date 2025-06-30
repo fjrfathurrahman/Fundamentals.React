@@ -3,11 +3,13 @@ import { Input } from './ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useProductStore } from '../store/product';
 import type { TLimit, TOrder, TSort } from '../services/types';
+import { useDebounce } from 'use-debounce';
+import { useEffect } from 'react';
 
 export default function SearchBar() {
   return (
     <div className="flex items-center gap-2 w-full max-w-full">
-      <SearchComponent/>
+      <SearchComponent />
       <SortComponent />
       <OrderComponent />
       <LimitComponent />
@@ -16,13 +18,20 @@ export default function SearchBar() {
 }
 
 const SearchComponent = () => {
-  const search = useProductStore(s => s.filters.search)
+  const search = useProductStore(s => s.filters.search);
   const setSearch = useProductStore(s => s.filters.setSearch);
+  const fetchProducts = useProductStore(s => s.fetchProducts);
+
+  const [debouncedSearch] = useDebounce(search, 600);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts, debouncedSearch]);
 
   return (
     <div className="relative flex-1">
       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-      <Input className="pl-10 pr-10" placeholder='Search a products is here...' value={search} onChange={(v => setSearch(v.target.value))} />
+      <Input className="pl-10 pr-10" placeholder="Search a products is here..." value={search} onChange={v => setSearch(v.target.value)} />
     </div>
   );
 };
@@ -55,10 +64,9 @@ const SortComponent = () => {
   );
 };
 
-
 const OrderComponent = () => {
-  const order = useProductStore(s => s.filters.order)
-  const setOrder = useProductStore(s => s.filters.setOrder)
+  const order = useProductStore(s => s.filters.order);
+  const setOrder = useProductStore(s => s.filters.setOrder);
 
   return (
     <Select value={order} onValueChange={(v: TOrder) => setOrder(v)}>
