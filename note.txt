@@ -1,4 +1,0 @@
-Add Features:
-- Create a Sidebar Filter Component to filter products by (category, brand, rating, and stock availability)
-- Create a Search Component to search for products
-- Create a Sorting Component to sort products (by price and news) 
